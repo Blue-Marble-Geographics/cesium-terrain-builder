@@ -792,6 +792,13 @@ main(int argc, char *argv[]) {
     progressFunc = GDALDummyProgress; // quiet
   }
 
+#ifndef NDEBUG
+  {
+      VSIRmdirRecursive(command.outputDir);
+      VSIMkdirRecursive(command.outputDir, 0777);
+  }
+#endif
+
   // Check whether or not the output directory exists
   VSIStatBufL stat;
   if (VSIStatExL(command.outputDir, &stat, VSI_STAT_EXISTS_FLAG | VSI_STAT_NATURE_FLAG)) {

@@ -22,6 +22,10 @@ if(NOT MSVC)
   endif()
 endif()
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 # We need g++ >= version 4.7 (see
 # http://stackoverflow.com/questions/4058565/check-gcc-minor-in-cmake)
 if (CMAKE_COMPILER_IS_GNUCXX)
