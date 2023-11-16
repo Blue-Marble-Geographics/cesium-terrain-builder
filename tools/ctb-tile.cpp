@@ -80,9 +80,11 @@ public:
     meshQualityFactor(1.0),
     metadata(false),
     cesiumFriendly(false),
-    vertexNormals(false)
+    vertexNormals(false),
+    wipeOutDirectory(false)
   {}
 
+#pragma region Setters
   void
   check() const {
     switch(command->argc) {
@@ -225,6 +227,13 @@ public:
     static_cast<TerrainBuild *>(Command::self(command))->vertexNormals = true;
   }
 
+  static void
+	  setWipeOutDirectory(command_t* command) {
+	  static_cast<TerrainBuild*>(Command::self(command))->wipeOutDirectory = true;
+  }
+
+#pragma endregion Setters
+
   const char *outputDir,
     *outputFormat,
     *profile;
@@ -244,6 +253,7 @@ public:
   bool metadata;
   bool cesiumFriendly;
   bool vertexNormals;
+  bool wipeOutDirectory;
 };
 
 /**
@@ -758,6 +768,7 @@ runTiler(const char *inputFilename, TerrainBuild *command, Grid *grid, TerrainMe
 int
 main(int argc, char *argv[]) {
   // Specify the command line interface
+
   TerrainBuild command = TerrainBuild(argv[0], version.cstr);
   command.setUsage("[options] GDAL_DATASOURCE");
   command.option("-o", "--output-dir <dir>", "specify the output directory for the tiles (defaults to working directory)", TerrainBuild::setOutputDir);
@@ -778,6 +789,7 @@ main(int argc, char *argv[]) {
   command.option("-N", "--vertex-normals", "Write 'Oct-Encoded Per-Vertex Normals' for Terrain Lighting, only for `Mesh` format", TerrainBuild::setVertexNormals);
   command.option("-q", "--quiet", "only output errors", TerrainBuild::setQuiet);
   command.option("-v", "--verbose", "be more noisy", TerrainBuild::setVerbose);
+  command.option("-w", "--wipe-out", "wipe out (re-create) the output directory", TerrainBuild::setWipeOutDirectory);
 
   // Parse and check the arguments
   command.parse(argc, argv);
@@ -792,12 +804,11 @@ main(int argc, char *argv[]) {
     progressFunc = GDALDummyProgress; // quiet
   }
 
-#ifndef NDEBUG
+  if(command.wipeOutDirectory)
   {
       VSIRmdirRecursive(command.outputDir);
       VSIMkdirRecursive(command.outputDir, 0777);
   }
-#endif
 
   // Check whether or not the output directory exists
   VSIStatBufL stat;
