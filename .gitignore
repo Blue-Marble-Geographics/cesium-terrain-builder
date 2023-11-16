@@ -3,3 +3,4 @@ build-*/
 build.bak/
 doc/html
 doc/latex
+.vs/

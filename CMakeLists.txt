@@ -66,10 +66,26 @@ endif()
 FIND_PACKAGE (Threads)
 
 # We need GDAL
-find_package(GDAL)
-if(NOT GDAL_FOUND)
-  message(FATAL_ERROR "The GDAL library cannot be found on the system")
+option(GDAL_SET_MANUALLY "Skip find_package(GDAL)" ON)
+if (NOT GDAL_SET_MANUALLY)
+    find_package(GDAL)
+    if(NOT GDAL_FOUND)
+      message(FATAL_ERROR "The GDAL library cannot be found on the system")
+    endif()
+else ()
+    set (GDAL_INCLUDE_DIRS "c:/opt/gdal-2.4.4/include")
+    add_library(GDAL::GDAL SHARED IMPORTED)
+
+    set_target_properties(GDAL::GDAL PROPERTIES
+        # INTERFACE_INCLUDE_DIRECTORIES "c:/opt/gdal-2.4.4/include"
+        IMPORTED_IMPLIB "c:/opt/gdal-2.4.4/lib/gdal_i.lib"
+        # IMPORTED_LINK_DEPENDENT_LIBRARIES_DEBUG "c:/opt/gdal-2.4.4/lib/gdal_i.lib"
+        IMPORTED_LOCATION "c:/opt/gdal-2.4.4/bin/gdal204.dll"
+    )
+
+    set (GDAL_LIBRARIES GDAL::GDAL)
 endif()
+
 include_directories(${GDAL_INCLUDE_DIRS})
 
 # Build and install libctb
