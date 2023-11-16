@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.12)
 project("Cesium Terrain Builder")
 
 # The version number
@@ -76,11 +76,18 @@ else ()
     set (GDAL_INCLUDE_DIRS "c:/opt/gdal-2.4.4/include")
     add_library(GDAL::GDAL SHARED IMPORTED)
 
+    set_property(TARGET GDAL::GDAL APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
     set_target_properties(GDAL::GDAL PROPERTIES
         # INTERFACE_INCLUDE_DIRECTORIES "c:/opt/gdal-2.4.4/include"
-        IMPORTED_IMPLIB "c:/opt/gdal-2.4.4/lib/gdal_i.lib"
-        # IMPORTED_LINK_DEPENDENT_LIBRARIES_DEBUG "c:/opt/gdal-2.4.4/lib/gdal_i.lib"
-        IMPORTED_LOCATION "c:/opt/gdal-2.4.4/bin/gdal204.dll"
+        IMPORTED_IMPLIB_RELEASE "c:/opt/gdal-2.4.4/lib/gdal_i.lib"
+        IMPORTED_LOCATION_RELEASE "c:/opt/gdal-2.4.4/bin/gdal204.dll"
+    )
+
+    set_property(TARGET GDAL::GDAL APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
+    set_target_properties(GDAL::GDAL PROPERTIES
+        # INTERFACE_INCLUDE_DIRECTORIES "c:/opt/gdal-2.4.4/include"
+        IMPORTED_IMPLIB_DEBUG "c:/opt/gdal-2.4.4/lib/debug/gdal_i.lib"
+        IMPORTED_LOCATION_DEBUG "c:/opt/gdal-2.4.4/bin/debug/gdal204.dll"
     )
 
     set (GDAL_LIBRARIES GDAL::GDAL)
