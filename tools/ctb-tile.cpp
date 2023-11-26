@@ -228,8 +228,8 @@ public:
   }
 
   static void
-	  setWipeOutDirectory(command_t* command) {
-	  static_cast<TerrainBuild*>(Command::self(command))->wipeOutDirectory = true;
+  setWipeOutDirectory(command_t* command) {
+    static_cast<TerrainBuild*>(Command::self(command))->wipeOutDirectory = true;
   }
 
 #pragma endregion Setters
