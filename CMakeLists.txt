@@ -105,3 +105,12 @@ add_subdirectory(deps)
 
 # Build and install the tools
 add_subdirectory(tools)
+
+option (CTB_BUILD_TESTS "Build [unit] tests" OFF)
+if (CTB_BUILD_TESTS)
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+    enable_testing()
+    add_subdirectory(tests)
+endif(CTB_BUILD_TESTS)
