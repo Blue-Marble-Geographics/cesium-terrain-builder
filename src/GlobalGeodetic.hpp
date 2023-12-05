@@ -43,14 +43,17 @@ public:
   GlobalGeodetic(i_tile tileSize = TILE_SIZE, bool tmsCompatible = true):
     Grid(tileSize,
          CRSBounds(-180, -90, 180, 90),
-         cSRS,
+         getSRS(),
          (tmsCompatible) ? 2 : 1)
   {}
 
 protected:
 
+  /// Returns the spatial reference for EPSG:4326
+  static OGRSpatialReference& getSRS();
+  
   /// The EPSG:4326 spatial reference system
-  static const OGRSpatialReference cSRS;
+  static std::unique_ptr<OGRSpatialReference> cSRS;
 };
 
 #endif /* GLOBALGEODETIC_HPP */

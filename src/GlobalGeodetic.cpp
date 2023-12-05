@@ -36,4 +36,15 @@ setSRS(void) {
   return srs;
 }
 
-const OGRSpatialReference GlobalGeodetic::cSRS = setSRS();
+// Get SRS 3785
+OGRSpatialReference& GlobalGeodetic::getSRS()
+{
+  // Create if necessary
+  if ( !cSRS )
+  {
+    cSRS = std::make_unique< OGRSpatialReference >( setSRS() );
+  }
+  return ( *cSRS );
+}
+
+std::unique_ptr< OGRSpatialReference > GlobalGeodetic::cSRS;

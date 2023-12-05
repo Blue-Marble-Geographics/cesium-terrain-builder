@@ -97,7 +97,7 @@ GDALTiler::GDALTiler(GDALDataset *poDataset, const Grid &grid, const TilerOption
       OGRCoordinateTransformation *transformer = OGRCreateCoordinateTransformation(&srcSRS, &gridSRS);
       if (transformer == NULL) {
         throw CTBException("The source dataset to tile grid coordinate transformation could not be created");
-      } else if (transformer->Transform(4, x, y) != true) {
+      } else if (transformer->Transform(4, x, y) != TRUE) {
         delete transformer;
         throw CTBException("Could not transform dataset bounds to tile spatial reference system");
       }

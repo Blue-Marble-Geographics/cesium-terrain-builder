@@ -43,4 +43,15 @@ setSRS(void) {
   return srs;
 }
 
-const OGRSpatialReference GlobalMercator::cSRS = setSRS();
+// Get SRS 3785
+OGRSpatialReference &GlobalMercator::getSRS()
+{
+  // Create if necessary
+  if ( !cSRS )
+  {
+    cSRS = std::make_unique< OGRSpatialReference >( setSRS() );
+  }
+  return ( *cSRS );
+}
+
+std::unique_ptr< OGRSpatialReference > GlobalMercator::cSRS;

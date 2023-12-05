@@ -42,10 +42,13 @@ public:
   GlobalMercator(i_tile tileSize = 256):
     Grid(tileSize,
          CRSBounds(-cOriginShift, -cOriginShift, cOriginShift, cOriginShift),
-         cSRS)
+         getSRS())
   {}
 
 protected:
+
+  /// Returns the spatial reference for EPSG:3785
+  static OGRSpatialReference &getSRS();
 
   /// The semi major axis of the WGS84 ellipsoid (the radius of the earth in
   /// meters)
@@ -58,7 +61,7 @@ protected:
   static const double cOriginShift;
 
   /// The EPSG:3785 spatial reference system
-  static const OGRSpatialReference cSRS;
+  static std::unique_ptr<OGRSpatialReference> cSRS;
 };
 
 #endif /* GLOBALMERCATOR_HPP */
