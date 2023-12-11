@@ -198,3 +198,93 @@ TEST_F(CTB_Test, t1)
       ASSERT_EQ(CE_Failure, poBand->ReadBlock(0, 527, pImage.data()));
   };
 }
+
+/// @brief Load C:\home\work\GM-13206.Cesium_Tilesets\data\M_09BZ1\M_09BZ1.TIF
+/// @param  
+/// @param  
+TEST_F(CTB_Test, t2)
+{
+  const char filename[] = R"(C:\home\work\GM-13206.Cesium_Tilesets\data\M_09BZ1\M_09BZ1.TIF)";
+  const float VOID_VAL = std::numeric_limits<float>::max(); // i.e. 3.4028234663852886e+38;
+
+  if (!fs::is_regular_file(filename))
+    GTEST_SKIP() << "Cannot find the filename: " << filename;
+
+  deleted_unique_ptr< GDALDataset> poDataset(
+    (GDALDataset*)GDALOpen(filename, GA_ReadOnly),
+    [](auto t) {
+      CONSOLE("GDALClose"); GDALClose(t);
+    });
+
+  ASSERT_TRUE(poDataset);
+
+  ASSERT_EQ(1, poDataset->GetRasterCount());
+  ASSERT_EQ(10000, poDataset->GetRasterXSize());
+  ASSERT_EQ(12500, poDataset->GetRasterYSize());
+
+  GDALRasterBand* poBand = poDataset->GetRasterBand(1);
+  ASSERT_TRUE(poBand != NULL);
+  ASSERT_EQ(GDT_Float32, poBand->GetRasterDataType());
+
+  {
+    int actual_ok;
+    CONSOLE_EVAL(poBand->GetNoDataValue());
+    float actual_void = poBand->GetNoDataValue(&actual_ok);
+    EXPECT_EQ(TRUE, actual_ok);
+    EXPECT_DOUBLE_EQ(VOID_VAL, actual_void);
+
+    union {
+      float d;
+      uint32_t u32;
+    } bits;
+
+    bits.d = actual_void;
+    CONSOLE("bits.u32 == " << std::hex << bits.u32 << std::dec);
+    CONSOLE_EVAL(std::numeric_limits<float>::max());
+  }
+
+  {
+    int x, y;
+    poBand->GetBlockSize(&x, &y);
+    EXPECT_EQ(256, x);
+    EXPECT_EQ(256, y);
+  }
+
+  {
+    auto srcWKT = poDataset->GetProjectionRef();
+    ASSERT_TRUE(srcWKT != NULL);
+    CONSOLE_EVAL(srcWKT);
+  }
+
+  {
+    double actual_gt[6] = { 0,0,0,0,0,0 };
+    ASSERT_EQ(0, poDataset->GetGeoTransform(actual_gt));
+    CONSOLE_FEVAL(actual_gt[0]);
+    CONSOLE_FEVAL(actual_gt[1]);
+    CONSOLE_FEVAL(actual_gt[2]);
+    CONSOLE_FEVAL(actual_gt[3]);
+    CONSOLE_FEVAL(actual_gt[4]);
+    CONSOLE_FEVAL(actual_gt[5]);
+  }
+
+  {
+    std::vector<float> pImage(256 * 256);
+    ASSERT_EQ(CE_None, poBand->ReadBlock(0, 0, pImage.data()));
+    for (auto i : { 0, 1, 2, 3, 100, 200, 300, 400, 420 })
+      CONSOLE(i << ", " << pImage[i]);
+  }
+  {
+    std::vector<float> pImage(256 * 256);
+    ASSERT_EQ(CE_None, poBand->ReadBlock(1, 0, pImage.data()));
+    for (auto i : { 0, 100, 200, 300, 400, 420 })
+      CONSOLE(i << ", " << pImage[i]);
+  }
+  {
+    std::vector<float> pImage(256 * 256);
+    ASSERT_EQ(CE_None, poBand->ReadBlock(39, 48, pImage.data()));
+    for (auto i : { 0, 100, 200, 300, 400, 256 * 256 - 1 })
+      CONSOLE(i << ", " << pImage[i]);
+  };
+}
+
+
